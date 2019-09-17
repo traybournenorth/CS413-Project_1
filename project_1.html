@@ -1,0 +1,564 @@
+<!--Project 1: Angry Man: Give Me Sushi
+
+	Keyboard movement cite: 
+	https://github.com/kittykatattack/learningPixi/blob/master/examples/12_keyboardMovement.html
+-->
+
+<!doctype html>
+<meta charset="utf-8">
+
+  <title>Project 1</title>
+
+  <body>
+
+    <h1>Instructions</h1>
+
+      <p>Use the W, S, A, D buttons to eat all of the sushi rolls.<br><br>
+      	 Notes: If you find yourself out of bounds, press the key button<br> in
+      	        the direction you were heading once to recenter the angry man.</p>
+
+    <script src="pixi.min.js"></script>
+
+    <script>
+
+      // Aliases
+      let Application = PIXI.Application;
+      let Text = PIXI.Text;
+      let Container = PIXI.Container;
+      let loader = PIXI.loader;
+      let resources = PIXI.loader.resources;
+      let TextureCache = PIXI.utils.TextureCache;
+      let Sprite = PIXI.Sprite;
+
+      // Creates PIXI application
+      let app = new Application(
+      { 
+        width: 400, 
+        height: 400,  
+        backgroundColor: 0xADD8E6,                     
+        antialiasing: true, 
+        transparent: false, 
+        resolution: 1
+      });
+
+      // Adds game to HTML document
+      document.body.appendChild( app.view );
+
+      loader.add( "angryMan.png" );
+      loader.add( "happyMan.png");
+      loader.add( "sushi.png" );
+      loader.load( setStage );
+      loader.load( endGame );
+
+      // Defines variables
+      var angryMan;
+      var happyMan;
+      var state;
+      var counter = 0;
+
+      function setStage() 
+      {
+      	// Creates angry man sprite 
+        angryMan = new Sprite( resources[ "angryMan.png" ].texture );
+
+        // Creates sushi
+        sushiOne = new Sprite( resources[ "sushi.png" ].texture );
+        sushiTwo = new Sprite( resources[ "sushi.png" ].texture );
+        sushiThree = new Sprite( resources[ "sushi.png" ].texture );
+        sushiFour = new Sprite( resources[ "sushi.png" ].texture );
+        sushiFive = new Sprite( resources[ "sushi.png" ].texture );
+        sushiSix = new Sprite( resources[ "sushi.png" ].texture );
+        sushiSeven = new Sprite( resources[ "sushi.png" ].texture );
+        sushiEight = new Sprite( resources[ "sushi.png" ].texture );
+
+        // Sets position of angry man and sets its velocity
+        angryMan.x = 180;
+        angryMan.y = 180; 
+        angryMan.vx = 0;
+        angryMan.vy = 0;
+
+        // Sets sushi one position
+        sushiOne.x = 15;
+        sushiOne.y = 18;
+        sushiOne.visible = false;
+
+        // Sets sushi two position
+        sushiTwo.x = 230;
+        sushiTwo.y = 70;
+        sushiTwo.visible = false;
+
+        // Sets sushi three position
+        sushiThree.x = 300;
+        sushiThree.y = 330;
+        sushiThree.visible = false;
+
+        // Sets sushi four position
+        sushiFour.x = 85;
+        sushiFour.y = 180;
+        sushiFour.visible = false;
+
+        // Sets sushi five position
+        sushiFive.x = 50;
+        sushiFive.y = 350;
+        sushiFive.visible = false;
+
+        // Sets sushi six position
+        sushiSix.x = 355;
+        sushiSix.y = 180;
+        sushiSix.visible = false;
+
+        // Sets sushi seven position
+        sushiSeven.x = 230;
+        sushiSeven.y = 220;
+        sushiSeven.visible = false;
+
+        // Sets sushi eight position
+        sushiEight.x = 340;
+        sushiEight.y = 20;
+        sushiEight.visible = false;
+
+        // Welcome text
+        let text = new PIXI.Text( 'Welcome to Angry Man: Give Me Sushi.\nThe Angry Man will not be happy' 
+                                   + ' until you eat all the sushi.\nPress the space bar to start game.',
+                                   { fontFamily : 'Arial', fontSize: 14, fill : 0x000000, visible: true } );
+
+        //Position it and add it to the stage
+        text.position.set( 10, 30 );
+        app.stage.addChild( text );
+
+        // Adds angry man to the stage
+        app.stage.addChild( angryMan );
+
+        // Adds sushi to the stage
+        app.stage.addChild( sushiOne );
+        app.stage.addChild( sushiTwo );
+        app.stage.addChild( sushiThree );
+        app.stage.addChild( sushiFour );
+        app.stage.addChild( sushiFive );
+        app.stage.addChild( sushiSix );
+        app.stage.addChild( sushiSeven );
+        app.stage.addChild( sushiEight );
+
+        // Assigns keyboard keys to variables
+        let aKey = keyboard( 65 );
+        let dKey = keyboard( 68 );
+        let wKey = keyboard( 87 );
+        let sKey = keyboard( 83 );
+
+        let spaceBar = keyboard( 32 );
+
+        // When the space bar is pressed
+        spaceBar.press = () =>
+        {
+        	// Makes start text not visible
+        	text.visible = false;
+
+        	// Shows sushi 
+          	sushiOne.visible = true;
+          	sushiTwo.visible = true;
+          	sushiThree.visible = true;
+          	sushiFour.visible = true;
+          	sushiFive.visible = true;
+          	sushiSix.visible = true;
+          	sushiSeven.visible = true;
+          	sushiEight.visible = true;
+
+          	// When the a key is pressed 
+          	aKey.press = () => 
+          	{
+          		// If the angry man's position is less than 10
+            	if ( angryMan.x < 10 )
+            	{
+            		// Resets angry man
+              		angryMan.x = 180;
+              		angryMan.y = 180;
+              		angryMan.vx = 0;
+              		angryMan.vy = 0;
+            	}
+
+            	// If w key and a key are down
+            	else if ( wKey.isDown )
+            	{
+              		// Move diagonally upward to the left
+              		angryMan.vx = -1;
+              		angryMan.vy = -1;
+            	}
+
+            	// If s key and a key are down
+            	else if ( sKey.isDown )
+            	{
+              		// Move diagonally downward to the left
+              		angryMan.vx = -1;
+              		angryMan.vy = 1;
+            	}
+
+            	else
+            	{
+              		// Move the angry man to the left
+              		angryMan.vx = -1;
+              		angryMan.vy = 0;
+            	}	
+            };
+      
+          	// When the a key is released
+          	aKey.release = () => 
+          	{
+          		// If d key is down
+            	if ( dKey.isDown )
+            	{
+            		// Move downward
+              		angryMan.vx = 1;
+              		angryMan.vy = 0;
+            	}
+
+            	else
+            	{
+              		// Stop the angry man
+              		angryMan.vx = 0;
+            	}
+          	};
+
+          	// When the d key is pressed 
+          	dKey.press = () => 
+          	{
+          		// If the angry man's position is greater than 357
+            	if ( angryMan.x > 357 )
+            	{
+              		// Resets angry man
+              		angryMan.x = 180;
+             		angryMan.y = 180;
+              		angryMan.vx = 0;
+              		angryMan.vy = 0;
+            	}
+
+            	// If w key and d key are down
+            	else if ( wKey.isDown )
+            	{
+              		// Move diagonally upward to the right
+              		angryMan.vx = 1;
+              		angryMan.vy = -1;
+            	}
+
+				// If d key and s key are down
+            	else if ( sKey.isDown )
+            	{
+              		// Move diagonally downward to the right
+              		angryMan.vx = 1;
+              		angryMan.vy = 1;
+            	}
+
+            	else
+            	{
+              		// Move the angry man to the right
+              		angryMan.vx = 1;
+              		angryMan.vy = 0;
+            	}
+          	};
+
+          	// When d key is released
+          	dKey.release = () => 
+          	{
+          		// If a key is down
+            	if ( aKey.isDown )
+            	{
+            		// Move to the left
+              		angryMan.vx = -1;
+              		angryMan.vy = 0;
+            	}
+
+            	else
+            	{
+              		// Stop the angry man
+              		angryMan.vx = 0;
+            	}
+          	};
+
+          	// When the w key is pressed 
+          	wKey.press = () => 
+          	{
+          		// If the angry man's position is less than 10
+            	if ( angryMan.y < 10 )
+            	{
+              		// Resets angry man
+              		angryMan.x = 180;
+              		angryMan.y = 180;
+              		angryMan.vx = 0;
+              		angryMan.vy = 0;
+            	}
+
+            	// If w key and d key are down
+            	else if ( dKey.isDown )
+            	{
+              		// Move diagonally upward to the right
+              		angryMan.vx = 1;
+              		angryMan.vy = -1;
+            	}
+
+            	// If w key and a key are down
+            	else if ( aKey.isDown )
+            	{
+              		// Move diagonally upward to the left
+              		angryMan.vx = -1;
+              		angryMan.vy = -1;
+            	}
+
+            	else
+            	{
+              		// Move the angry man up
+              		angryMan.vy = -1;
+              		angryMan.vx = 0;
+            	} 
+          	}
+
+          	// When w key gets released
+          	wKey.release = () => 
+          	{
+          		// If s key down
+            	if ( sKey.isDown )
+            	{
+            		// Move downward
+              		angryMan.vx = 0;
+              		angryMan.vy = 1;
+            	}
+
+            	else
+            	{
+            		// Stop the angry man
+              		angryMan.vy = 0;
+            	}
+          	};
+
+          	// When the s key is pressed 
+          	sKey.press = () => 
+          	{
+            	if ( angryMan.y > 357 )
+            	{
+              		// Resets angry man
+              		angryMan.x = 180;
+              		angryMan.y = 180;
+              		angryMan.vx = 0;
+              		angryMan.vy = 0;
+            	}
+
+            	else if ( dKey.isDown )
+            	{
+              		// Move diagonally downward to the right
+              		angryMan.vx = 1;
+              		angryMan.vy = 1;
+            	}
+
+            	else if ( aKey.isDown )
+            	{	
+              		// Move diagonally downward to the left
+              		angryMan.vx = -1;
+              		angryMan.vy = 1;
+            	}
+
+            	else
+            	{
+              		// Move the angry man down
+              		angryMan.vx = 0;
+              		angryMan.vy = 1;
+            	}
+         	};
+
+         	// When the s key is released
+          	sKey.release = () => 
+          	{
+          		// If the w key is down
+            	if ( wKey.isDown )
+            	{
+            		// Move upward
+              		angryMan.vx = 0;
+              		angryMan.vy = -1;
+            	}
+
+            	else
+            	{
+              		// Stop the angry man
+              		angryMan.vy = 0;
+            	}
+          	};
+        };
+
+        // Set the game state
+        state = play;
+   
+        // Start the game loop 
+        app.ticker.add( delta => gameLoop( delta ) );
+      }
+
+      function gameLoop( delta )
+      {
+        // Update the current game state
+        state( delta );
+      }
+
+      function play( delta ) 
+      {
+        // Adds angry man's velocity to its original position
+        angryMan.x += angryMan.vx;
+        angryMan.y += angryMan.vy;
+
+        eatSushi();
+        endGame();
+      }
+
+      function eatSushi()
+      {
+      	if ( ( ( angryMan.x <= sushiOne.x + 5 ) && ( angryMan.x >= sushiOne.x - 5 ) ) 
+                 && ( ( angryMan.y <= sushiOne.y + 5 ) && ( angryMan.y >= sushiOne.y - 5 ) ) )
+        {
+        	sushiOne.visible = false;
+          	app.stage.removeChild( sushiOne );
+          	counter += 1;
+        }
+
+        else if ( ( ( angryMan.x <= sushiTwo.x + 5 ) && ( angryMan.x >= sushiTwo.x - 5 ) ) 
+                 && ( ( angryMan.y <= sushiTwo.y + 5 ) && ( angryMan.y >= sushiTwo.y - 5 ) ) )
+        {
+          	sushiTwo.visible = false;
+          	app.stage.removeChild( sushiTwo );
+          	counter += 1;
+        }
+
+        else if ( ( ( angryMan.x <= sushiThree.x + 5 ) && ( angryMan.x >= sushiThree.x - 5 ) ) 
+                 && ( ( angryMan.y <= sushiThree.y + 5 ) && ( angryMan.y >= sushiThree.y - 5 ) ) )
+        {
+          	sushiThree.visible = false;
+          	app.stage.removeChild( sushiThree );
+          	counter += 1;
+        }
+
+        else if ( ( ( angryMan.x <= sushiFour.x + 5 ) && ( angryMan.x >= sushiFour.x - 5 ) ) 
+                 && ( ( angryMan.y <= sushiFour.y + 5 ) && ( angryMan.y >= sushiFour.y - 5 ) ) )
+        {
+          	sushiFour.visible = false;
+          	app.stage.removeChild( sushiFour );
+          	counter += 1;
+        }
+
+        if ( ( ( angryMan.x <= sushiFive.x + 5 ) && ( angryMan.x >= sushiFive.x - 5 ) ) 
+                 && ( ( angryMan.y <= sushiFive.y + 5 ) && ( angryMan.y >= sushiFive.y - 5 ) ) )
+        {
+          	sushiFive.visible = false;
+          	app.stage.removeChild( sushiFive );
+          	counter += 1;
+        }
+
+        else if ( ( ( angryMan.x <= sushiSix.x + 5 ) && ( angryMan.x >= sushiSix.x - 5 ) ) 
+                 && ( ( angryMan.y <= sushiSix.y + 5 ) && ( angryMan.y >= sushiSix.y - 5 ) ) )
+        {
+          	sushiSix.visible = false;
+          	app.stage.removeChild( sushiSix );
+          	counter += 1;
+        }
+
+        else if ( ( ( angryMan.x <= sushiSeven.x + 5 ) && ( angryMan.x >= sushiSeven.x - 5 ) ) 
+                 && ( ( angryMan.y <= sushiSeven.y + 5 ) && ( angryMan.y >= sushiSeven.y - 5 ) ) )
+        {
+          	sushiSeven.visible = false;
+          	app.stage.removeChild( sushiSeven );
+          	counter += 1;
+        }
+
+        else if ( ( ( angryMan.x <= sushiEight.x + 5 ) && ( angryMan.x >= sushiEight.x - 5 ) ) 
+                 && ( ( angryMan.y <= sushiEight.y + 5 ) && ( angryMan.y >= sushiEight.y - 5 ) ) )
+        {
+          	sushiEight.visible = false;
+          	app.stage.removeChild( sushiEight );
+          	counter += 1;
+        }
+      }
+
+      function endGame()
+      {
+        if ( sushiOne.visible == false && sushiTwo.visible == false && sushiThree.visible == false
+             && sushiFour.visible == false && sushiFive.visible == false && sushiSix.visible == false
+             && sushiSeven.visible == false && sushiEight.visible == false && counter >= 8 )
+        {
+          	app.stage.removeChild( angryMan );
+
+          	happyMan = new Sprite( resources[ "happyMan.png" ].texture );
+
+          	// Game over text
+          	let gameOverText = new PIXI.Text( 'CONGRATS! You made the angry man happy again :)',
+                                   { fontFamily : 'Arial', fontSize: 14, fill : 0x000000, 
+                                     visible : true } );
+
+          	// Position it and add it to the stage
+          	gameOverText.position.set( 40, 150 );
+
+          	// Add game over text to stage
+          	app.stage.addChild( gameOverText );
+
+          	// Add happy man to stage
+          	app.stage.addChild( happyMan );
+
+          	// Position happy man
+          	happyMan.x = 180;
+          	happyMan.y = 180;
+          	happyMan.vx = 0;
+          	happyMan.vy = 0;
+        }
+      }
+
+      // Keyboard function 
+      function keyboard( keyCode ) 
+      {
+        var key = {};
+        key.code = keyCode;
+        key.isDown = false;
+        key.isUp = true;         
+
+        key.downHandler = event => 
+        {
+          if ( event.keyCode == key.code && key.press )
+          {
+              key.press();
+              key.isDown = true;
+              key.isUp = false;
+          }
+          
+          event.preventDefault();
+        };
+
+        key.upHandler = event => 
+        {
+          if ( event.keyCode == key.code && key.release )
+          {
+              key.release();
+              key.isDown = false;
+              key.isUp = true;
+          }
+          
+          event.preventDefault();
+        };
+
+        window.addEventListener( "keydown", key.downHandler.bind( key ), false );
+        window.addEventListener( "keyup", key.upHandler.bind( key ), false );
+        return key;
+      }
+
+    </script>
+
+    <div id="disqus_thread"></div>
+
+    <h1>Comments</h1>
+
+    <script>
+
+		( function() 
+      	{
+        	var d = document, s = d.createElement( 'script' );
+
+        	s.src = 'http://nau-cs413.disqus.com/embed.js';
+
+        	s.setAttribute('data-timestamp', + new Date());
+
+        	( d.head || d.body ).appendChild( s );
+      	} )(); 
+
+    </script>
+
+  </body>
